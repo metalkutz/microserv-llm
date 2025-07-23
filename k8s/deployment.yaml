@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: microserv-llm
+  labels:
+    app: microserv-llm
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: microserv-llm
+  template:
+    metadata:
+      labels:
+        app: microserv-llm
+    spec:
+      containers:
+      - name: microserv-llm
+        image: microserv-llm:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          limits:
+            cpu: "1"
+            memory: "1Gi"
+          requests:
+            cpu: "500m"
+            memory: "512Mi"
