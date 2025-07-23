@@ -39,7 +39,7 @@ WORKDIR /src
 COPY --from=build /app/.venv /src/.venv
 
 # Configurar PATH para usar el entorno virtual
-ENV PATH="/app/.venv/bin:$PATH"
+ENV PATH="/src/.venv/bin:$PATH"
 
 # Copiar archivos de la aplicación
 COPY src/ /src/
@@ -47,13 +47,6 @@ COPY src/ /src/
 # configurar variables de entorno
 ENV PYTHONPATH=/src
 ENV PYTHONUNBUFFERED=1
-
-# predescargar el modelo de Hugging Face
-# RUN python -c "from transformers import DistilBertTokenizer, DistilBertForSequenceClassification; \
-#     tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased-finetuned-sst-2-english'); \
-#     model = DistilBertForSequenceClassification.from_pretrained('distilbert-base-uncased-finetuned-sst-2-english'); \
-#     tokenizer.save_pretrained('/src/models'); \
-#     model.save_pretrained('/src/models')"
 
 # Exponer el puerto de la aplicación
 EXPOSE 8000
@@ -63,4 +56,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3\
     CMD curl -f http://localhost:8000/health || exit 1
 
 # Comando para ejecutar la aplicación
-CMD ["uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["/src/.venv/bin/python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
