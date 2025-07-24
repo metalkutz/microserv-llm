@@ -85,7 +85,10 @@ make docker-stop    # Detener el contenedor
 docker build -t microserv-llm:latest .
 
 # Ejecutar el contenedor
-docker run -p 8000:8000 microserv-llm:latest
+docker run -p 8000:8000 microserv-llm-container:latest
+
+# Detener el contenedor
+docker stop microserv-llm-container
 ```
 
 ## Documentación API
