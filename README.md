@@ -6,11 +6,13 @@ Microservicio de inferencia para clasificación de sentimientos usando el modelo
 
 - [Descripción](#descripción)
 - [Inicio Rápido](#inicio-rápido)
-
+- [Construcción y ejecución con Docker](#construcción-y-ejecución-con-docker)
+- [Documentacion API](#documentación-api)
+- [Configuración Kubernetes (k8s) y AWS](#configuración-kubernetes-k8s-y-aws)
 
 ## Descripción
 
-El microservicio utiliza el modelo `distilbert-base-uncased-finetuned-sst-2-english` disponible en Hugging Face el cual analiza el sentimiento de textos y los clasifica. Cabe mencionar que el lenguaje del modelo es en inglés por lo que el texto provisto debe ser en ese idioma. El modelo clasificará el texto como **positivo** o **negativo** con un nivel de confianza correspondiente.
+El microservicio utiliza el modelo `distilbert-base-uncased-finetuned-sst-2-english` disponible en Hugging Face el cual analiza el sentimiento de textos y los clasifica. Cabe mencionar que el lenguaje del modelo es en inglés por lo que el texto provisto debe ser en ese idioma. El modelo clasificará el texto como **POSITIVE** o **NEGATIVE** con un nivel de confianza correspondiente.
 
 ### Componentes Principales
 
@@ -116,10 +118,49 @@ curl -X POST "http://localhost:8000/predict_sentiment" \
   }'
 ```
 
-## Configuración de Recursos
+## Configuración Kubernetes (k8s) y AWS
 
-Para el microservicio ML se recomienda:
+### Recursos del Pod
 
-- **CPU**: 500m-1000m por pod
-- **Memory**: 1Gi-2Gi por pod
-- **Replicas**: 2-10 (con HPA)
+En los manifiestos de Kubernetes, se recomienda definir los recursos del pod para el microservicio de la siguiente manera:
+
+```yaml
+resources:
+  requests:
+    cpu: "500m"
+    memory: "1Gi"
+  limits:
+    cpu: "1000m"
+    memory: "2Gi"
+```
+
+Esto asegura que cada pod tenga recursos mínimos garantizados y límites máximos para evitar sobrecarga.
+
+### Exposición del Servicio
+
+Para exponer el microservicio externamente, se utiliza un Service de tipo `LoadBalancer`:
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: microserv-llm-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: microserv-llm
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000
+```
+
+Esto crea automáticamente un Load Balancer en AWS que enruta el tráfico al servicio.
+
+### Recursos AWS necesarios
+
+- **Amazon EKS**: Cluster Kubernetes gestionado.
+- **AWS Load Balancer Controller**: Para gestionar la creación de Load Balancers (ALB/NLB) desde los servicios tipo `LoadBalancer`.
+- **IAM Roles for Service Accounts (IRSA)**: Si el microservicio necesita acceder a otros servicios AWS (como S3), se recomienda configurar roles IAM específicos para los pods.
+
+> **Nota:** La integración de estos recursos se realiza durante la creación del cluster EKS y la instalación de controladores, siguiendo la [documentación oficial de AWS](https://docs.aws.amazon.com/eks/latest/userguide/).
