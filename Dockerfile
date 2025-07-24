@@ -33,19 +33,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # configurar directorio de trabajo
-WORKDIR /src
+WORKDIR /app
 
 # Copiar el entorno virtual de poetry desde el stage build
-COPY --from=build /app/.venv /src/.venv
+COPY --from=build /app/.venv /app/.venv
 
 # Configurar PATH para usar el entorno virtual
-ENV PATH="/src/.venv/bin:$PATH"
+ENV PATH="/app/.venv/bin:$PATH"
 
 # Copiar archivos de la aplicación
-COPY src/ /src/
+COPY src/ /app/src/
 
 # configurar variables de entorno
-ENV PYTHONPATH=/src
+ENV PYTHONPATH=/app
 ENV PYTHONUNBUFFERED=1
 
 # Exponer el puerto de la aplicación
@@ -56,4 +56,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3\
     CMD curl -f http://localhost:8000/health || exit 1
 
 # Comando para ejecutar la aplicación
-CMD ["/src/.venv/bin/python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["/app/.venv/bin/python", "-m", "uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "8000"]
