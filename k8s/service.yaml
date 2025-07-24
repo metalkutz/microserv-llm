@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: microserv-llm
+  name: clasificacion-sentimiento-service
   labels:
-    app: microserv-llm
+    app: clasificacion-sentimiento
 spec:
   selector:
-    app: microserv-llm
+    app: clasificacion-sentimiento
   ports:
     - protocol: TCP
       port: 80
