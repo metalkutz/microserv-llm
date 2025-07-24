@@ -1,29 +1,32 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: clasificacion-sentimiento-deployment
+  name: microserv-llm-deployment
   labels:
-    app: clasificacion-sentimiento
+    app: microserv-llm
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: clasificacion-sentimiento
+      app: microserv-llm
   template:
     metadata:
       labels:
-        app: clasificacion-sentimiento
+        app: microserv-llm
     spec:
       containers:
-      - name: clasificacion-sentimiento
-        image: clasificacion-sentimiento:latest
+      - name: microserv-llm
+        image: microserv-llm:latest
         ports:
-        - containerPort: 8080
+        - containerPort: 8000
         env:
         - name: PYTHONUNBUFFERED
           value: "1"
         - name: TRANSFORMERS_CACHE
           value: "/tmp/transformers_cache"
+        envFrom:
+        - configMapRef:
+            name: microserv-llm-config
         resources:
           limits:
             cpu: "1000m"

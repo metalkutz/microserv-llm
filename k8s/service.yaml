@@ -1,14 +1,14 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: clasificacion-sentimiento-service
+  name: microserv-llm-service
   labels:
-    app: clasificacion-sentimiento
+    app: microserv-llm
 spec:
   selector:
-    app: clasificacion-sentimiento
+    app: microserv-llm
   ports:
     - protocol: TCP
       port: 80
-      targetPort: 8080
+      targetPort: 8000
   type: ClusterIP

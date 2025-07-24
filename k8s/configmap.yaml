@@ -1,16 +1,17 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: clasificacion-sentimiento-config
+  name: microserv-llm-config
 data:
   MODEL_NAME: "distilbert-base-uncased-finetuned-sst-2-english"
   LOG_LEVEL: "INFO"
   MAX_SENTENCE_LENGTH: "512"
+  ENVIRONMENT: "production"
 ---
 apiVersion: v1
 kind: Secret
 metadata:
-  name: clasificacion-sentimiento-secret
+  name: microserv-llm-secret
 type: Opaque
 data:
   API_KEY: <base64_encoded_api_key>
