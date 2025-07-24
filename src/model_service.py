@@ -1,5 +1,5 @@
 import logging
-from typing import Dict, Any
+from typing import Dict, List, Any
 from transformers import AutoTokenizer, AutoModelForSequenceClassification, pipeline
 import torch
 
@@ -15,7 +15,6 @@ class TextClassifierService:
         self.model = None
         self.classifier = None
         self._model_loaded = False
-        self.load_model()
 
     def load_model(self) -> None:
         """Carga el modelo y el tokenizer de Hugging Face."""
@@ -46,7 +45,7 @@ class TextClassifierService:
         """Verifica si el modelo ha sido cargado correctamente."""
         return self._model_loaded
     
-    def classify(self, text: str) -> Dict[str, Any]:
+    def classify(self, text: str) -> List[Dict[str, Any]]:
         """
         Clasifica el texto dado y devuelve la etiqueta y la puntuación de confianza.
         Args:
@@ -60,7 +59,6 @@ class TextClassifierService:
         try:
             logger.info(f"Clasificando texto: {text}")
             results = self.classifier(text)
-            print("resultado de la clasificación:", results)
             label = results[0]["label"]
             score = results[0]["score"]
             logger.info(f"Resultado de la clasificación: {label} ({score})")
@@ -68,3 +66,17 @@ class TextClassifierService:
         except Exception as e:
             logger.error(f"Error al clasificar el texto: {e}")
             raise RuntimeError(f"Error al clasificar el texto: {e}") from e
+    
+    def unload_model(self) -> None:
+        """Libera los recursos del modelo y el tokenizer."""
+        if self.classifier is not None:
+            del self.classifier
+            self.classifier = None
+        if self.model is not None:
+            del self.model
+            self.model = None
+        if self.tokenizer is not None:
+            del self.tokenizer
+            self.tokenizer = None
+        self._model_loaded = False
+        logger.info("Modelo y tokenizer liberados.")

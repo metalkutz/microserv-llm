@@ -5,6 +5,7 @@ from src.model_service import TextClassifierService
 def text_classifier_service():
     """Fixture para inicializar el servicio de clasificación de texto."""
     service = TextClassifierService()
+    service.load_model()
     yield service
 
 def test_model_loading(text_classifier_service):

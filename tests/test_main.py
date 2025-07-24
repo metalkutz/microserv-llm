@@ -23,6 +23,14 @@ def test_health_endpoint(client):
     assert "status" in data
     assert data["status"] in ["healthy", "unhealthy"]
 
+def test_model_loaded(client):
+    response = client.get("/health")
+    assert response.status_code == 200
+    data = response.json()
+    assert "model_loaded" in data
+    assert isinstance(data["model_loaded"], bool)
+    assert "device" in data
+    assert data["device"] in ["cuda", "cpu"]
 
 def test_predict_sentiment_positive(client):
     payload = {"text": "I love this product!"}
